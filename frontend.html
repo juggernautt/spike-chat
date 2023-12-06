@@ -1,0 +1,14 @@
+<html>
+<head>
+    <title>Chat</title>
+</head>
+<body>
+Hello
+<script>
+    const ws = new WebSocket('ws://localhost:8080');
+    ws.addEventListener('open', () => {
+        ws.send({a: 1});
+    });
+</script>
+</body>
+</html>
