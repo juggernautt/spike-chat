@@ -6,7 +6,6 @@ body {
     border-right: 1px solid #dee2e6;
     height: 100vh;
     margin: 10px;
-
 }
 
 #users ul {
@@ -31,22 +30,24 @@ body {
     height: 85vh;
 }
 
-
 .message {
     padding: 10px;
     margin: 10px;
     border-radius: 8px;
     max-width: 70%;
 }
+.message .timestamp {
+    font-size: 0.6rem;
+    display: block;
+}
 
-.other-user-message {
+
+.other {
     background-color: #d4edda;
 }
 
-.mine-message {
+.mine {
     background-color: #cce5ff;
-    float: right;
-    clear: both;
 }
 
 #message-input {
@@ -64,5 +65,4 @@ body {
     position: absolute;
     bottom: 0;
     right: 0;
-
 }

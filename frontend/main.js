@@ -27,12 +27,12 @@ ws.addEventListener('message', (msg) => {
         case USER_LIST_EVENT:
             const users = payload.users;
             state.users = users;
-            document.getElementById('users').innerHTML = renderUsers(state.users).innerHTML;
+            document.getElementById('users').innerHTML = renderUsers(state.users).outerHTML;
 
             break;
         case MESSAGE_EVENT:
             state.messages = [...state.messages, payload];
-            document.getElementById('messages').innerHTML = renderMessages(state.messages).innerHTML;
+            document.getElementById('messages').innerHTML = renderMessages(state.messages).outerHTML;
 
             break;
         default:
@@ -60,15 +60,32 @@ const renderUsers = (users) => {
     return container;
 }
 const renderMessages = (messages) => {
-    const container = createElement('div', {class: 'message-container'});
+    const container = createElement('div', {class: 'message-container d-flex flex-column'});
     messages.forEach(message => {
-        const messageDiv = createElement('div', {class: `message ${message.sender === state.username ? 'mine-message' : 'other-user-message'}`});
-        messageDiv.textContent = `${message.sender}:${message.content}`;
+        const messageDiv = createElement('div', {class: `message ${message.sender === state.username ? 'mine align-self-end' : 'other align-self-start'}`});
+
+        const senderSpan = createElement('span', {class: 'sender'});
+        senderSpan.textContent = `${message.sender} `;
+        senderSpan.style.fontWeight = 'bold';
+
+        const contentSpan = createElement('span', {class: 'content'});
+        contentSpan.textContent = message.content;
+
+
+        const timestampSpan = createElement('span', {class: 'timestamp'});
+        const timestamp = new Date(message.ts);
+        timestampSpan.textContent = timestamp.toLocaleTimeString();
+
+        messageDiv.appendChild(senderSpan);
+        messageDiv.appendChild(contentSpan);
+        messageDiv.appendChild(timestampSpan)
+
         container.appendChild(messageDiv);
     });
 
     return container;
 }
+
 
 
 const messageInput = document.getElementById('message-input');
