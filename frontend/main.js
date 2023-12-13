@@ -31,8 +31,7 @@ ws.addEventListener('message', (msg) => {
 
             break;
         case MESSAGE_EVENT:
-            const messages = [...state.messages, payload];
-            state.messages = messages;
+            state.messages = [...state.messages, payload];
             document.getElementById('messages').innerHTML = renderMessages(state.messages).innerHTML;
 
             break;
