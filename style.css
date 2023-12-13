@@ -1,0 +1,68 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+#users {
+    border-right: 1px solid #dee2e6;
+    height: 100vh;
+    margin: 10px;
+
+}
+
+#users ul {
+    list-style: none;
+    padding: 0;
+}
+
+#users li {
+    padding: 10px;
+    border: none;
+}
+
+#users li:hover {
+    background-color: #e2e6ea;
+}
+
+#chat {
+    height: 100vh;
+}
+#messages {
+    overflow-y: auto;
+    height: 85vh;
+}
+
+
+.message {
+    padding: 10px;
+    margin: 10px;
+    border-radius: 8px;
+    max-width: 70%;
+}
+
+.other-user-message {
+    background-color: #d4edda;
+}
+
+.mine-message {
+    background-color: #cce5ff;
+    float: right;
+    clear: both;
+}
+
+#message-input {
+    width: 100%;
+    margin: 10px;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+}
+
+#new-message {
+    position: relative;
+}
+#send-button {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+
+}

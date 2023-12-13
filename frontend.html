@@ -1,14 +1,36 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>Chat</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+    <title>Chat App</title>
 </head>
 <body>
-Hello
-<script>
-    const ws = new WebSocket('ws://localhost:8080');
-    ws.addEventListener('open', () => {
-        ws.send({a: 1});
-    });
-</script>
+<div class="container-fluid">
+    <div class="row">
+        <div id="users" class="col-md-3">
+
+        </div>
+        <div id="chat" class="col-md-8">
+            <div id="messages">
+            </div>
+            <div id="new-message">
+                <textarea id="message-input" placeholder="Type your message..." class="form-control"></textarea>
+                    <button id="send-button" type="button" class="btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-send" viewBox="0 0 16 16">
+                            <path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576zm6.787-8.201L1.591 6.602l4.339 2.76 7.494-7.493Z"/>
+                        </svg>
+                    </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+<script type="text/javascript" src="main.js"></script>
+
 </body>
 </html>
+
