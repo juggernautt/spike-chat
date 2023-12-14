@@ -2,9 +2,41 @@ const LOGIN_EVENT = 'user_login';
 const MESSAGE_EVENT = 'message';
 const LOGOUT_EVENT = 'user_logout';
 const USER_LIST_EVENT = 'user_list';
+const ERROR_EVENT = 'error';
 const state = {
-    username: undefined, users: [], messages: []
+    username: undefined, users: [], messages: [], errors: []
 };
+
+const handleStateChange = ({key, value}) => {
+    switch (key) {
+        case 'username':
+            document.getElementById("username-block").style.display = value ? "none" : "block";
+            document.getElementById("new-message-block").style.display = value ? "block" : "none";
+            break;
+        case 'messages':
+            document.getElementById('messages').innerHTML = renderMessages(value).outerHTML;
+            break;
+        case 'users':
+            document.getElementById('users').innerHTML = renderUsers(value).outerHTML;
+            break;
+        case 'errors':
+            if(value.length > 0) {
+                document.getElementById('errors').innerHTML = renderErrors(value).outerHTML;
+            }
+            break;
+    }
+}
+
+
+const stateProxy = new Proxy(state, {
+    set: function(target, property, value) {
+        target[property] = value;
+
+        handleStateChange({key: property, value });
+        return true;
+    }
+});
+
 
 
 const ws = new WebSocket('ws://localhost:8080');
@@ -13,33 +45,65 @@ const sendLogin = (username) => send(LOGIN_EVENT, {username})
 const sendMessage = (message) => send(MESSAGE_EVENT, {sender: state.username, content: message, ts: Date.now()})
 
 ws.addEventListener('open', () => {
-    if (!state.username) {
-        const username = prompt("What is your name?").trim();
-        state.username = username;
-        sendLogin(username);
-    }
 });
 
 
 ws.addEventListener('message', (msg) => {
     const {type, payload} = JSON.parse(msg.data);
     switch (type) {
+        case LOGIN_EVENT:
+            stateProxy.username = payload.username;
+            break;
         case USER_LIST_EVENT:
             const users = payload.users;
-            state.users = users;
-            document.getElementById('users').innerHTML = renderUsers(state.users).outerHTML;
-
+            stateProxy.users = users;
             break;
         case MESSAGE_EVENT:
-            state.messages = [...state.messages, payload];
-            document.getElementById('messages').innerHTML = renderMessages(state.messages).outerHTML;
-
+            stateProxy.messages = [...state.messages, payload];
+            break;
+        case ERROR_EVENT:
+            stateProxy.errors = payload.errors;
             break;
         default:
             break;
 
     }
 });
+
+
+const messageInput = document.getElementById('message-input');
+const sendButton = document.getElementById('send-button');
+
+sendButton.addEventListener('click', function () {
+    const text = messageInput.value.trim();
+    if (text !== '') sendMessage(text)
+    messageInput.value = '';
+});
+
+messageInput.addEventListener('keydown', function (event) {
+    if (event.key === 'Enter') {
+        event.preventDefault(); // Prevent the newline character from being inserted
+        const text = messageInput.value.trim();
+        if (text !== '') sendMessage(text)
+        messageInput.value = '';
+    }
+});
+
+const usernameInput = document.getElementById("username-input");
+const usernameBtn = document.getElementById("send-username");
+
+usernameInput.addEventListener("input", function () {
+    usernameBtn.disabled = usernameInput.value.trim() === ""
+});
+
+
+usernameBtn.addEventListener("click", function () {
+    stateProxy.errors = [];
+    const username = usernameInput.value.trim();
+    sendLogin(username);
+    usernameInput.value = '';
+});
+
 
 
 const createElement = function (element, attrs) {
@@ -86,22 +150,12 @@ const renderMessages = (messages) => {
     return container;
 }
 
-
-
-const messageInput = document.getElementById('message-input');
-const sendButton = document.getElementById('send-button');
-
-sendButton.addEventListener('click', function () {
-    const text = messageInput.value.trim();
-    if (text !== '') sendMessage(text)
-    messageInput.value = '';
-});
-
-messageInput.addEventListener('keydown', function (event) {
-    if (event.key === 'Enter') {
-        event.preventDefault(); // Prevent the newline character from being inserted
-        const text = messageInput.value.trim();
-        if (text !== '') sendMessage(text)
-        messageInput.value = '';
-    }
-});
+const renderErrors = (errors) => {
+    const list = createElement('div', {class: 'errors-container'});
+    errors.forEach(error => {
+        const errorItem = createElement('li', {class: 'error'})
+        error.textContent = error
+        list.appendChild(errorItem);
+    })
+    return list;
+}
