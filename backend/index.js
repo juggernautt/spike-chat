@@ -5,35 +5,32 @@ const LOGIN_EVENT = 'user_login';
 const MESSAGE_EVENT = 'message';
 const LOGOUT_EVENT = 'user_logout';
 const USER_LIST_EVENT = 'user_list';
-const clients = {};
+const ERROR_EVENT = 'error';
+
+const clients = new Map();
 
 ws.on('connection', (client) => {
     console.log('A client connected');
     client.on('message', (message) => {
 
-        const {type, payload}  = JSON.parse(message);
-        console.log(type)
-        console.log(payload);
+        const {type, payload} = JSON.parse(message);
         switch (type) {
             case LOGIN_EVENT:
-                //check if not yet exist
-                //generate unique id
-                //send updated user list?
-                clients[payload.username] = client;
-                sendToAll(USER_LIST_EVENT, {users: getActiveUsers()})
-
+                if (clients.has(payload.username)) {
+                    sendToOne(client, ERROR_EVENT, {errors: ['already exists']})
+                } else {
+                    clients.set(payload.username, client)
+                    sendToOne(client, LOGIN_EVENT, {username: payload.username})
+                    sendToAll(USER_LIST_EVENT, {users: getActiveUsers()})
+                }
                 break;
             case LOGOUT_EVENT:
-                delete clients[payload.username];
+                clients.delete(payload.username)
                 sendToAll(USER_LIST_EVENT, {users: getActiveUsers()})
-
-                //remove from clients
-                //send updated user list?
                 break;
             case MESSAGE_EVENT:
                 sendToAll(MESSAGE_EVENT, payload)
                 break;
-            //add some error handling
         }
 
 
@@ -44,12 +41,13 @@ ws.on('connection', (client) => {
     });
 });
 
-const sendToAll = (type, payload) => {
-    Object.entries(clients).forEach(([username, client]) => {
-        client.send(JSON.stringify({type,  payload}));
+const sendToAll = (type, payload ) => {
+    clients.forEach(client => {
+        client.send(JSON.stringify({type, payload}));
     });
 }
+const sendToOne = (client, type, payload ) => {
+    client.send(JSON.stringify({type, payload}));
+}
 
-const getActiveUsers = () =>  Object.keys(clients)
-
-//const generate_uid = (name) => `${name}_${Date.now()}`
+const getActiveUsers = () => [...clients.keys()]
