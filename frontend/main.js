@@ -72,13 +72,6 @@ ws.addEventListener('message', (msg) => {
 
 
 const messageInput = document.getElementById('message-input');
-const sendButton = document.getElementById('send-button');
-
-sendButton.addEventListener('click', function () {
-    const text = messageInput.value.trim();
-    if (text !== '') sendMessage(text)
-    messageInput.value = '';
-});
 
 messageInput.addEventListener('keydown', function (event) {
     if (event.key === 'Enter') {
