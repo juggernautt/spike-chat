@@ -20,9 +20,7 @@ const handleStateChange = ({key, value}) => {
             document.getElementById('users').innerHTML = renderUsers(value).outerHTML;
             break;
         case 'errors':
-            if(value.length > 0) {
-                document.getElementById('errors').innerHTML = renderErrors(value).outerHTML;
-            }
+            document.getElementById('errors').innerHTML = value.length > 0 ?  renderErrors(value).outerHTML : ''
             break;
     }
 }
@@ -43,8 +41,10 @@ const ws = new WebSocket('ws://localhost:8080');
 const send = (type, payload) => ws.send(JSON.stringify({type, payload}))
 const sendLogin = (username) => send(LOGIN_EVENT, {username})
 const sendMessage = (message) => send(MESSAGE_EVENT, {sender: state.username, content: message, ts: Date.now()})
+const getActiveUsers = () => send(USER_LIST_EVENT, {})
 
 ws.addEventListener('open', () => {
+    getActiveUsers();
 });
 
 
@@ -151,10 +151,10 @@ const renderMessages = (messages) => {
 }
 
 const renderErrors = (errors) => {
-    const list = createElement('div', {class: 'errors-container'});
+    const list = createElement('ul', {class: 'errors-container'});
     errors.forEach(error => {
         const errorItem = createElement('li', {class: 'error'})
-        error.textContent = error
+        errorItem.textContent = error
         list.appendChild(errorItem);
     })
     return list;
