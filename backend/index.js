@@ -31,6 +31,10 @@ ws.on('connection', (client) => {
             case MESSAGE_EVENT:
                 sendToAll(MESSAGE_EVENT, payload)
                 break;
+            case USER_LIST_EVENT:
+                sendToOne(client, USER_LIST_EVENT, {users: getActiveUsers()})
+                break;
+
         }
 
 
