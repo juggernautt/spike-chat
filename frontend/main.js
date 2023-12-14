@@ -7,6 +7,7 @@ const state = {
     username: undefined, users: [], messages: [], errors: []
 };
 
+
 const handleStateChange = ({key, value}) => {
     switch (key) {
         case 'username':
@@ -15,6 +16,8 @@ const handleStateChange = ({key, value}) => {
             break;
         case 'messages':
             document.getElementById('messages').innerHTML = renderMessages(value).outerHTML;
+            const messagesContainer = document.getElementById("messages");
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
             break;
         case 'users':
             document.getElementById('users').innerHTML = renderUsers(value).outerHTML;
@@ -72,13 +75,13 @@ ws.addEventListener('message', (msg) => {
 
 
 const messageInput = document.getElementById('message-input');
-
 messageInput.addEventListener('keydown', function (event) {
     if (event.key === 'Enter') {
         event.preventDefault(); // Prevent the newline character from being inserted
         const text = messageInput.value.trim();
         if (text !== '') sendMessage(text)
         messageInput.value = '';
+
     }
 });
 
