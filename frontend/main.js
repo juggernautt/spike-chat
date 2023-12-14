@@ -43,7 +43,7 @@ const stateProxy = new Proxy(state, {
 const ws = new WebSocket('ws://localhost:8080');
 const send = (type, payload) => ws.send(JSON.stringify({type, payload}))
 const sendLogin = (username) => send(LOGIN_EVENT, {username})
-const sendMessage = (message) => send(MESSAGE_EVENT, {sender: state.username, content: message, ts: Date.now()})
+const sendMessage = (message) => send(MESSAGE_EVENT, {message})
 const getActiveUsers = () => send(USER_LIST_EVENT, {})
 
 ws.addEventListener('open', () => {
