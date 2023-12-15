@@ -14,7 +14,7 @@ fi
 
 #create database && messages table
 MYSQL_SCRIPT=$(cat <<EOL
-CREATE DATABASE IF NOT EXISTS spike-chat;
+CREATE DATABASE IF NOT EXISTS spike_chat;
 USE spike_chat;
 CREATE TABLE IF NOT EXISTS messages (
   id INT AUTO_INCREMENT PRIMARY KEY,

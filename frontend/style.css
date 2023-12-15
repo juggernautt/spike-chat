@@ -69,7 +69,7 @@ body {
     display: inline-block;
 }
 
-#new-message-block {
+#new-message {
     position: relative;
     display: none;
 }

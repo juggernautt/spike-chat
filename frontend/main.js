@@ -12,8 +12,8 @@ const state = {
 const handleStateChange = ({key, value}) => {
     switch (key) {
         case 'username':
-            document.getElementById("username-block").style.display = value ? "none" : "block";
-            document.getElementById("new-message-block").style.display = value ? "block" : "none";
+            document.getElementById("username").style.display = value ? "none" : "block";
+            document.getElementById("new-message").style.display = value ? "block" : "none";
             break;
         case 'messages':
             document.getElementById('messages').innerHTML = renderMessages(value).outerHTML;
