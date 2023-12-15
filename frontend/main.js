@@ -1,3 +1,4 @@
+const INIT_EVENT = 'init_chat';
 const LOGIN_EVENT = 'user_login';
 const MESSAGE_EVENT = 'message';
 const LOGOUT_EVENT = 'user_logout';
@@ -41,19 +42,23 @@ const stateProxy = new Proxy(state, {
 
 
 const ws = new WebSocket('ws://localhost:8080');
-const send = (type, payload) => ws.send(JSON.stringify({type, payload}))
+const send = (type, payload = {}) => ws.send(JSON.stringify({type, payload}))
 const sendLogin = (username) => send(LOGIN_EVENT, {username})
 const sendMessage = (message) => send(MESSAGE_EVENT, {message})
-const getActiveUsers = () => send(USER_LIST_EVENT, {})
+const initializeChat = () => send(INIT_EVENT)
 
 ws.addEventListener('open', () => {
-    getActiveUsers();
+    initializeChat();
 });
 
 
 ws.addEventListener('message', (msg) => {
     const {type, payload} = JSON.parse(msg.data);
     switch (type) {
+        case INIT_EVENT:
+            stateProxy.users = payload.users;
+            stateProxy.messages = payload.messages;
+            break;
         case LOGIN_EVENT:
             stateProxy.username = payload.username;
             break;

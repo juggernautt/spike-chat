@@ -1,7 +1,12 @@
 const WebSocket = require('ws');
-const ws = new WebSocket.Server({port: 8080});
+require('dotenv').config();
+const ws = new WebSocket.Server({port: process.env.WS_PORT});
 const { v4: uuidv4 } = require('uuid');
+const {getChatHistory, addMessage} = require("./database");
 
+
+
+const INIT_EVENT = 'init_chat';
 const LOGIN_EVENT = 'user_login';
 const MESSAGE_EVENT = 'message';
 const LOGOUT_EVENT = 'user_logout';
@@ -10,11 +15,16 @@ const ERROR_EVENT = 'error';
 
 const activeUsers = new Map();
 
-ws.on('connection', (client) => {
+ws.on('connection',  (client) => {
     console.log('A client connected');
-    client.on('message', (message) => {
+    client.on('message', async (message) => {
         const {type, payload} = JSON.parse(message);
         switch (type) {
+            case INIT_EVENT:
+                const chatHistory = await getChatHistory();
+                sendToOne(client, INIT_EVENT, {messages: chatHistory, users: getActiveUsers()});
+                break;
+
             case LOGIN_EVENT:
                 const uuid = uuidv4();
                 if (activeUsers.has(payload.username)) {
@@ -31,10 +41,9 @@ ws.on('connection', (client) => {
                 break;
             case MESSAGE_EVENT:
                 const username = getUsername(client);
-                sendToAll(MESSAGE_EVENT, {content: payload.message, sender: username, ts: Date.now()})
-                break;
-            case USER_LIST_EVENT:
-                sendToOne(client, USER_LIST_EVENT, {users: getActiveUsers()})
+                const data2send = {content: payload.message, sender: username};
+                sendToAll(MESSAGE_EVENT, {...data2send, ts: Date.now()})
+                await addMessage(data2send)
                 break;
         }
     });
