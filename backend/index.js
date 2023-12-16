@@ -1,7 +1,6 @@
 const WebSocket = require('ws');
 require('dotenv').config();
 const ws = new WebSocket.Server({port: process.env.WS_PORT});
-const { v4: uuidv4 } = require('uuid');
 const {getChatHistory, addMessage} = require("./database");
 
 
@@ -28,8 +27,7 @@ ws.on('connection',  (client) => {
                 if (userNameExist(payload.username)) {
                     sendToOne(client, ERROR_EVENT, {errors: ['username already exists']})
                 } else {
-                    const uuid = uuidv4();
-                    activeUsers.set(uuid, {client, username: payload.username})
+                    activeUsers.set(payload.username, client)
                     sendToOne(client, LOGIN_EVENT, {username: payload.username})
                     sendToAll(USER_LIST_EVENT, {users: getActiveUsers()})
                 }
@@ -44,27 +42,20 @@ ws.on('connection',  (client) => {
     });
 
     client.on('close', () => {
-        activeUsers.delete(getUserUId(client))
+        activeUsers.delete(getUsername(client))
         sendToAll(USER_LIST_EVENT, {users: getActiveUsers()})
     });
 });
 
 const sendToAll = (type, payload ) => {
-    activeUsers.forEach(({client, username}) => {
+    activeUsers.forEach((client) => {
         client.send(JSON.stringify({type, payload}));
     });
 }
 const sendToOne = (client, type, payload ) => client.send(JSON.stringify({type, payload}));
 
-const getActiveUsers = () => [...activeUsers.values()].map(user => user.username)
+const getActiveUsers = () => [...activeUsers.keys()]
 
-const getUsername = (client) => {
-    const {username} = [...activeUsers.values()].find(user => user.client === client)
-    return username;
-}
+const getUsername = (client) =>  [...activeUsers.keys()].find(key => activeUsers.get(key) === client);
 
-const userNameExist = (username) => !![...activeUsers.values()].find((user) => user.username === username)
-
-
-
-const getUserUId = (client) => [...activeUsers.keys()].find(key => activeUsers.get(key).client === client);
+const userNameExist = (username) => !![...activeUsers.keys()].find((name) => name === username);
