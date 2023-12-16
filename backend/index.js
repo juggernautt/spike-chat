@@ -1,9 +1,7 @@
 const WebSocket = require('ws');
 require('dotenv').config();
 const ws = new WebSocket.Server({port: process.env.WS_PORT});
-const { v4: uuidv4 } = require('uuid');
 const {getChatHistory, addMessage} = require("./database");
-
 
 
 const INIT_EVENT = 'init_chat';
@@ -15,6 +13,7 @@ const ERROR_EVENT = 'error';
 
 const activeUsers = new Map();
 
+
 ws.on('connection',  (client) => {
     console.log('A client connected');
     client.on('message', async (message) => {
@@ -24,20 +23,14 @@ ws.on('connection',  (client) => {
                 const chatHistory = await getChatHistory();
                 sendToOne(client, INIT_EVENT, {messages: chatHistory, users: getActiveUsers()});
                 break;
-
             case LOGIN_EVENT:
-                const uuid = uuidv4();
-                if (activeUsers.has(payload.username)) {
+                if (userNameExist(payload.username)) {
                     sendToOne(client, ERROR_EVENT, {errors: ['username already exists']})
                 } else {
-                    activeUsers.set(uuid, {client, username: payload.username})
+                    activeUsers.set(payload.username, client)
                     sendToOne(client, LOGIN_EVENT, {username: payload.username})
                     sendToAll(USER_LIST_EVENT, {users: getActiveUsers()})
                 }
-                break;
-            case LOGOUT_EVENT:
-                activeUsers.delete(getUserUId(client))
-                sendToAll(USER_LIST_EVENT, {users: getActiveUsers()})
                 break;
             case MESSAGE_EVENT:
                 const username = getUsername(client);
@@ -49,22 +42,20 @@ ws.on('connection',  (client) => {
     });
 
     client.on('close', () => {
-        console.log('Client disconnected');
+        activeUsers.delete(getUsername(client))
+        sendToAll(USER_LIST_EVENT, {users: getActiveUsers()})
     });
 });
 
 const sendToAll = (type, payload ) => {
-    activeUsers.forEach(({client, username}) => {
+    activeUsers.forEach((client) => {
         client.send(JSON.stringify({type, payload}));
     });
 }
 const sendToOne = (client, type, payload ) => client.send(JSON.stringify({type, payload}));
 
-const getActiveUsers = () => [...activeUsers.values()].map(user => user.username)
+const getActiveUsers = () => [...activeUsers.keys()]
 
-const getUsername = (client) => {
-    const {username} = [...activeUsers.values()].find(entry => entry.client === client)
-    return username;
-}
+const getUsername = (client) =>  [...activeUsers.keys()].find(key => activeUsers.get(key) === client);
 
-const getUserUId = (client) => [...activeUsers.keys()].find(key => activeUsers.get(key) === client);
+const userNameExist = (username) => !![...activeUsers.keys()].find((name) => name === username);
