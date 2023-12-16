@@ -4,38 +4,19 @@ const MESSAGE_EVENT = 'message';
 const LOGOUT_EVENT = 'user_logout';
 const USER_LIST_EVENT = 'user_list';
 const ERROR_EVENT = 'error';
+
 const state = {
-    username: undefined, users: [], messages: [], errors: []
+    username: undefined,
+    users: [],
+    messages: [],
+    errors: []
 };
 
-const $ = (id) => {
-    const el = document.getElementById(id);
-    if (!el) {
-        throw `Element ${id} not found`;
-    }
-
-    return {
-        element: el,
-        css: function (props) {
-            Object.entries(props).forEach(([key, value]) => {
-                el.style[key] = value;
-            })
-            return this;
-        },
-        html: function (html) {
-            el.innerHTML = html;
-            return this;
-        },
-        on: function (type, callback) {
-            el.addEventListener(type, callback)
-            return this;
-        },
-        scrollDown: function () {
-            el.scrollTop = el.scrollHeight
-            return this;
-        }
-    }
+const timeFormat = (ts) => {
+    const timestamp = new Date(ts);
+    return timestamp.toLocaleTimeString();
 }
+
 
 const renderUsers = (users) => {
     let html = '<ul>';
@@ -44,11 +25,6 @@ const renderUsers = (users) => {
     })
     html += '</ul>'
     return html;
-}
-
-const timeFormat = (ts) => {
-    const timestamp = new Date(ts);
-    return timestamp.toLocaleTimeString();
 }
 
 const renderMessages = (messages) => {
@@ -141,25 +117,26 @@ ws.addEventListener('message', (msg) => {
 $("message-input").on("keydown", function (event) {
     if (event.key === 'Enter') {
         event.preventDefault();
-        const text = event.currentTarget.value.trim();
+        const $el = $(event.currentTarget);
+        const text = $el.element.value.trim();
         if (text !== '') {
             sendMessage(text)
         }
-        event.currentTarget.value = '';
+        $el.attr({value: ''});
     }
 });
 
 $("username-input").on("input", function (event) {
-    $("username-btn").element.disabled = event.currentTarget.value.trim() === '';
+    $("username-btn").disabled(event.currentTarget.value.trim() === '');
 });
 
 
 $("username-btn").on("click", function () {
     stateProxy.errors = [];
-    const userInput = $("username-input").element;
-    const username = userInput.value.trim();
+    const userInput = $("username-input");
+    const username = userInput.element.value.trim();
     sendLogin(username);
-    userInput.value = ''
+    userInput.attr({value: ''});
 });
 
 
