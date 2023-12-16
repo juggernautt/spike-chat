@@ -13,9 +13,7 @@ const pool = mysql.createPool({
 });
 
 
-
-
-const addMessage = async ({ sender, content }) => {
+const addMessage = async ({sender, content}) => {
     try {
         const query = 'INSERT INTO messages (sender, content) VALUES (?, ?)';
         await pool.promise().execute(query, [sender, content]);
@@ -23,6 +21,7 @@ const addMessage = async ({ sender, content }) => {
         throw error;
     }
 };
+
 
 const getChatHistory = async () => {
     try {

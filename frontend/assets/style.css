@@ -7,6 +7,7 @@ body {
     width: 95%;
     margin-top: 10px;
 }
+
 #users {
     border-right: 1px solid #dee2e6;
     height: 95vh;
@@ -63,6 +64,7 @@ body {
     padding: 10px;
     border-radius: 8px;
     border: 1px solid #ced4da;
+    box-sizing: border-box;
 }
 
 #username-input {
@@ -78,6 +80,7 @@ body {
     position: relative;
     display: none;
 }
+
 #send-button {
     position: absolute;
     bottom: 0;

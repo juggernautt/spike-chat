@@ -27,7 +27,7 @@ const $ = (selector) => {
             for (let i in props) {
                 el.setAttribute(i, props[i]);
             }
-            return el;
+            return this;
         },
         html: function (html) {
             el.innerHTML = html;

@@ -3,39 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css"
-          integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
-
-    <link rel="stylesheet" href="style.css">
-    <title>Chat App</title>
+    <link rel="stylesheet" href="assets/bootstrap-grid.min.css" type="text/css">
+    <link rel="stylesheet" href="assets/style.css" type="text/css">
+    <title>Spike. Chat App</title>
 </head>
 <body>
+
 <div class="container-fluid" id="app">
     <div class="row">
-        <div id="users" class="col-md-3"></div>
-        <div id="chat" class="col-md-8">
-            <div id="messages"></div>
-            <div id="username">
-                <input id="username-input" type="text" placeholder="Set username" name="username" class="form-control"/>
-                <button id="username-btn" class="btn btn-dark" type="button" disabled>send</button>
-            </div>
 
-            <div id="new-message">
-                <textarea id="message-input" placeholder="Type your message..." class="form-control"></textarea>
+        <div id="users" class="col-md-3"></div>
+
+        <div id="chat" class="col-md-9">
+            <div id="messages"></div>
+            <div id="input-area">
+                <div id="username">
+                    <input id="username-input" type="text" placeholder="Set username" name="username"
+                           class="form-control"/>
+                    <button id="username-btn" class="btn btn-dark" type="button" disabled>send</button>
+                </div>
+                <div id="new-message">
+                    <textarea id="message-input" placeholder="Type your message..." class="form-control"></textarea>
+                </div>
+                <div id="errors"></div>
             </div>
-            <div id="errors"></div>
         </div>
+
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
-        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
-        crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/js/bootstrap.min.js"
-        integrity="sha384-oesi62hOLfzrys4LxRF63OJCXdXDipiYWBnvTl9Y9/TRlw5xlKIEHpNyvvDShgf/"
-        crossorigin="anonymous"></script>
-<script type="text/javascript" src="dom.js"></script>
-<script type="text/javascript" src="main.js"></script>
+<script type="text/javascript" src="assets/dom.js"></script>
+<script type="text/javascript" src="assets/web-socket.js"></script>
+<script type="text/javascript" src="assets/state.js"></script>
+<script type="text/javascript" src="assets/renderers.js"></script>
+<script type="text/javascript" src="assets/main.js"></script>
 
 </body>
 </html>

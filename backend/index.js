@@ -4,7 +4,6 @@ const ws = new WebSocket.Server({port: process.env.WS_PORT});
 const {getChatHistory, addMessage} = require("./database");
 
 
-
 const INIT_EVENT = 'init_chat';
 const LOGIN_EVENT = 'user_login';
 const MESSAGE_EVENT = 'message';
@@ -13,6 +12,7 @@ const USER_LIST_EVENT = 'user_list';
 const ERROR_EVENT = 'error';
 
 const activeUsers = new Map();
+
 
 ws.on('connection',  (client) => {
     console.log('A client connected');
