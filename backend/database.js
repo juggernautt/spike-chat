@@ -27,11 +27,7 @@ const addMessage = async ({ sender, content }) => {
 const getChatHistory = async () => {
     try {
         const [results] = await pool.promise().query('SELECT sender, content, ts FROM messages ORDER BY ts ASC');
-        return results.map((row) => ({
-            sender: row.sender,
-            content: row.content,
-            ts: row.ts,
-        }));
+        return results;
     } catch (error) {
         throw error;
     }
