@@ -43,6 +43,11 @@ const $ = (selector) => {
         },
         disabled: function(isDisabled) {
             el.disabled = isDisabled;
+            return this;
+        },
+        value: function (val) {
+            el.value = val;
+            return this
         }
     }
 }

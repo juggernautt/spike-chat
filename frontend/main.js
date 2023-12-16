@@ -122,7 +122,7 @@ $("message-input").on("keydown", function (event) {
         if (text !== '') {
             sendMessage(text)
         }
-        $el.attr({value: ''});
+        $el.value('');
     }
 });
 
@@ -136,7 +136,7 @@ $("username-btn").on("click", function () {
     const userInput = $("username-input");
     const username = userInput.element.value.trim();
     sendLogin(username);
-    userInput.attr({value: ''});
+    userInput.value('');
 });
 
 
