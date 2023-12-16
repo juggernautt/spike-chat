@@ -38,6 +38,11 @@ body {
     border-radius: 8px;
     max-width: 70%;
 }
+
+.message .sender {
+    font-weight: bold;
+}
+
 .message .timestamp {
     font-size: 0.6rem;
     display: block;

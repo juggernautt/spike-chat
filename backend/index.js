@@ -24,12 +24,11 @@ ws.on('connection',  (client) => {
                 const chatHistory = await getChatHistory();
                 sendToOne(client, INIT_EVENT, {messages: chatHistory, users: getActiveUsers()});
                 break;
-
             case LOGIN_EVENT:
-                const uuid = uuidv4();
-                if (activeUsers.has(payload.username)) {
+                if (userNameExist(payload.username)) {
                     sendToOne(client, ERROR_EVENT, {errors: ['username already exists']})
                 } else {
+                    const uuid = uuidv4();
                     activeUsers.set(uuid, {client, username: payload.username})
                     sendToOne(client, LOGIN_EVENT, {username: payload.username})
                     sendToAll(USER_LIST_EVENT, {users: getActiveUsers()})
@@ -63,8 +62,12 @@ const sendToOne = (client, type, payload ) => client.send(JSON.stringify({type, 
 const getActiveUsers = () => [...activeUsers.values()].map(user => user.username)
 
 const getUsername = (client) => {
-    const {username} = [...activeUsers.values()].find(entry => entry.client === client)
+    const {username} = [...activeUsers.values()].find(user => user.client === client)
     return username;
 }
+
+const userNameExist = (username) => !![...activeUsers.values()].find((user) => user.username === username)
+
+
 
 const getUserUId = (client) => [...activeUsers.keys()].find(key => activeUsers.get(key) === client);

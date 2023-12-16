@@ -8,37 +8,98 @@ const state = {
     username: undefined, users: [], messages: [], errors: []
 };
 
+const $ = (id) => {
+    const el = document.getElementById(id);
+    if (!el) {
+        throw `Element ${id} not found`;
+    }
+
+    return {
+        element: el,
+        css: function (props) {
+            Object.entries(props).forEach(([key, value]) => {
+                el.style[key] = value;
+            })
+            return this;
+        },
+        html: function (html) {
+            el.innerHTML = html;
+            return this;
+        },
+        on: function (type, callback) {
+            el.addEventListener(type, callback)
+            return this;
+        },
+        scrollDown: function () {
+            el.scrollTop = el.scrollHeight
+            return this;
+        }
+    }
+}
+
+const renderUsers = (users) => {
+    let html = '<ul>';
+    users.forEach(user => {
+        html += `<li class="user list-group-item">${user}</li>`
+    })
+    html += '</ul>'
+    return html;
+}
+
+const timeFormat = (ts) => {
+    const timestamp = new Date(ts);
+    return timestamp.toLocaleTimeString();
+}
+
+const renderMessages = (messages) => {
+    let html = `<div class="d-flex flex-column">`
+    messages.forEach(message => {
+        html += `<div class="message ${message.sender === state.username ? 'mine align-self-end' : 'other align-self-start'}">
+                    <span class="sender">${message.sender}</span>
+                    <span class="content">${message.content}</span>
+                    <span class="timestamp">${timeFormat(message.ts)}</span>
+                 </div>`
+    });
+    html += `</div>`
+    return html;
+}
+
+const renderErrors = (errors) => {
+    let html = '<ul>'
+    errors.forEach(error => {
+        html += `<li class="error">${error}</li>`
+    })
+    html += '</ul>'
+    return html;
+}
 
 const handleStateChange = ({key, value}) => {
     switch (key) {
         case 'username':
-            document.getElementById("username").style.display = value ? "none" : "block";
-            document.getElementById("new-message").style.display = value ? "block" : "none";
+            $("username").css({display: value ? "none" : "block"});
+            $("new-message").css({display: value ? "block" : "none"});
             break;
         case 'messages':
-            document.getElementById('messages').innerHTML = renderMessages(value).outerHTML;
-            const messagesContainer = document.getElementById("messages");
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            $("messages").html(renderMessages(value)).scrollDown()
             break;
         case 'users':
-            document.getElementById('users').innerHTML = renderUsers(value).outerHTML;
+            $("users").html(renderUsers(value));
             break;
         case 'errors':
-            document.getElementById('errors').innerHTML = value.length > 0 ?  renderErrors(value).outerHTML : ''
+            $("errors").html(value.length > 0 ? renderErrors(value) : '');
             break;
     }
 }
 
 
 const stateProxy = new Proxy(state, {
-    set: function(target, property, value) {
+    set: function (target, property, value) {
         target[property] = value;
 
-        handleStateChange({key: property, value });
+        handleStateChange({key: property, value});
         return true;
     }
 });
-
 
 
 const ws = new WebSocket('ws://localhost:8080');
@@ -74,89 +135,33 @@ ws.addEventListener('message', (msg) => {
             break;
         default:
             break;
-
     }
 });
 
-
-const messageInput = document.getElementById('message-input');
-messageInput.addEventListener('keydown', function (event) {
+$("message-input").on("keydown", function (event) {
     if (event.key === 'Enter') {
-        event.preventDefault(); // Prevent the newline character from being inserted
-        const text = messageInput.value.trim();
-        if (text !== '') sendMessage(text)
-        messageInput.value = '';
-
+        event.preventDefault();
+        const text = event.currentTarget.value.trim();
+        if (text !== '') {
+            sendMessage(text)
+        }
+        event.currentTarget.value = '';
     }
 });
 
-const usernameInput = document.getElementById("username-input");
-const usernameBtn = document.getElementById("send-username");
-
-usernameInput.addEventListener("input", function () {
-    usernameBtn.disabled = usernameInput.value.trim() === ""
+$("username-input").on("input", function (event) {
+    $("username-btn").element.disabled = event.currentTarget.value.trim() === '';
 });
 
 
-usernameBtn.addEventListener("click", function () {
+$("username-btn").on("click", function () {
     stateProxy.errors = [];
-    const username = usernameInput.value.trim();
+    const userInput = $("username-input").element;
+    const username = userInput.value.trim();
     sendLogin(username);
-    usernameInput.value = '';
+    userInput.value = ''
 });
 
 
 
-const createElement = function (element, attrs) {
-    const el = document.createElement(element);
-    for (let i in attrs) {
-        el.setAttribute(i, attrs[i]);
-    }
-    return el;
-}
 
-const renderUsers = (users) => {
-    const container = createElement('ul', {class: 'users-container list-group'});
-    users.forEach(user => {
-        const userItem = createElement('li', {class: 'user list-group-item'})
-        userItem.textContent = user;
-        container.appendChild(userItem);
-    })
-    return container;
-}
-const renderMessages = (messages) => {
-    const container = createElement('div', {class: 'message-container d-flex flex-column'});
-    messages.forEach(message => {
-        const messageDiv = createElement('div', {class: `message ${message.sender === state.username ? 'mine align-self-end' : 'other align-self-start'}`});
-
-        const senderSpan = createElement('span', {class: 'sender'});
-        senderSpan.textContent = `${message.sender} `;
-        senderSpan.style.fontWeight = 'bold';
-
-        const contentSpan = createElement('span', {class: 'content'});
-        contentSpan.textContent = message.content;
-
-
-        const timestampSpan = createElement('span', {class: 'timestamp'});
-        const timestamp = new Date(message.ts);
-        timestampSpan.textContent = timestamp.toLocaleTimeString();
-
-        messageDiv.appendChild(senderSpan);
-        messageDiv.appendChild(contentSpan);
-        messageDiv.appendChild(timestampSpan)
-
-        container.appendChild(messageDiv);
-    });
-
-    return container;
-}
-
-const renderErrors = (errors) => {
-    const list = createElement('ul', {class: 'errors-container'});
-    errors.forEach(error => {
-        const errorItem = createElement('li', {class: 'error'})
-        errorItem.textContent = error
-        list.appendChild(errorItem);
-    })
-    return list;
-}
