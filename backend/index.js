@@ -34,10 +34,6 @@ ws.on('connection',  (client) => {
                     sendToAll(USER_LIST_EVENT, {users: getActiveUsers()})
                 }
                 break;
-            case LOGOUT_EVENT:
-                activeUsers.delete(getUserUId(client))
-                sendToAll(USER_LIST_EVENT, {users: getActiveUsers()})
-                break;
             case MESSAGE_EVENT:
                 const username = getUsername(client);
                 const data2send = {content: payload.message, sender: username};
@@ -48,7 +44,8 @@ ws.on('connection',  (client) => {
     });
 
     client.on('close', () => {
-        console.log('Client disconnected');
+        activeUsers.delete(getUserUId(client))
+        sendToAll(USER_LIST_EVENT, {users: getActiveUsers()})
     });
 });
 
@@ -70,4 +67,4 @@ const userNameExist = (username) => !![...activeUsers.values()].find((user) => u
 
 
 
-const getUserUId = (client) => [...activeUsers.keys()].find(key => activeUsers.get(key) === client);
+const getUserUId = (client) => [...activeUsers.keys()].find(key => activeUsers.get(key).client === client);
